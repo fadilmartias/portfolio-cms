@@ -23,7 +23,8 @@ Route::middleware('auth')->group(function () {
         return view('dashboard.index');
     })->name('dashboard');
 
-    Route::resource('/projects', ProjectController::class);
+    Route::resource('/projects', ProjectController::class)->except(['show']);
+    Route::post('/projects/upload', [ProjectController::class, 'upload'])->name('projects.upload');
 });
 
 Auth::routes();

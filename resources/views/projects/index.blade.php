@@ -4,11 +4,12 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Basic Datatables</h5>
+                <div class="card-header d-flex justify-content-between">
+                    <h5 class="card-title mb-0">List Projects</h5>
+                    <a href="{{ route('projects.create') }}" class="btn btn-primary">Tambah Data</a>
                 </div>
                 <div class="card-body">
-                    <table id="example" class="table table-bordered dt-responsive nowrap table-striped align-middle"
+                    <table id="datatable" class="table table-bordered dt-responsive nowrap table-striped align-middle"
                         style="width:100%">
                         <thead>
                             <tr>
@@ -17,12 +18,12 @@
                                         <input class="form-check-input fs-15" type="checkbox" id="checkAll" value="option">
                                     </div>
                                 </th>
-                                <th data-ordering="false">No</th>
-                                <th data-ordering="false">Judul</th>
+                                <th>No</th>
+                                <th>Judul</th>
                                 <th data-ordering="false">Deskripsi</th>
                                 <th data-ordering="false">Gambar</th>
                                 <th data-ordering="false">Tech</th>
-                                <th>Action</th>
+                                <th data-ordering="false">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -36,8 +37,9 @@
                                     </th>
                                     <td>{{ $item->id }}</td>
                                     <td>{{ $item->title }}</td>
-                                    <td>{{ $item->description }}</td>
-                                    <td><img width="300px" height="200px" src="{{ $item->image }}" alt="{{ $item->title }}"></td>
+                                    <td>{!! $item->description !!}</td>
+                                    <td><img width="300px" height="200px" src="{{ $item->image }}"
+                                            alt="{{ $item->title }}"></td>
                                     <td>
                                         <ul>
                                             @foreach ($item->tech as $tech)
@@ -53,9 +55,7 @@
                                                 <i class="ri-more-fill align-middle"></i>
                                             </button>
                                             <ul class="dropdown-menu dropdown-menu-end">
-                                                <li><a href="#!" class="dropdown-item"><i
-                                                            class="ri-eye-fill align-bottom me-2 text-muted"></i> View</a>
-                                                </li>
+
                                                 <li><a class="dropdown-item edit-item-btn"><i
                                                             class="ri-pencil-fill align-bottom me-2 text-muted"></i>
                                                         Edit</a>
@@ -82,3 +82,25 @@
     </div>
     <!--end row-->
 @endsection
+
+@push('styles')
+    <!--datatable css-->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" />
+    <!--datatable responsive css-->
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap.min.css" />
+@endpush
+
+@push('scripts')
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+    <!--datatable js-->
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            new DataTable("#datatable")
+        });
+    </script>
+@endpush
