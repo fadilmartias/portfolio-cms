@@ -17,7 +17,7 @@ class ProjectSeeder extends Seeder
             'title' => 'PTIPD UIN Suska Riau Website',
             'description' => 'Company profile website for Pusat Teknologi Informasi dan Pangkalan Data UIN Suska Riau',
             'link' => 'https://ptipd.uin-suska.ac.id/',
-            'img_path' => '/img/portfolio/ptipd.png',
+            'image' => 'ptipd.png',
             'tech' => ['wordpress'],
             'type' => 'Freelance Project',
             'password' => bcrypt('cp')

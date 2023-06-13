@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProjectController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,6 +22,8 @@ Route::middleware('auth')->group(function () {
     Route::get('dashboard', function () {
         return view('dashboard.index');
     })->name('dashboard');
+
+    Route::resource('/projects', ProjectController::class);
 });
 
 Auth::routes();

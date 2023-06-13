@@ -12,7 +12,11 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        //
+        $data = Project::orderBy('created_at', 'desc')->get();
+
+        return view('projects.index', [
+            'data' => $data,
+        ]);
     }
 
     /**

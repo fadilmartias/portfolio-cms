@@ -40,7 +40,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('dashboard') }}">
+                            <a class="nav-link {{ Route::currentRouteNamed('projects.*') ? 'active' : '' }}" href="{{ route('projects.index') }}">
                                 <i class="ri-dashboard-2-line"></i> <span>Projects</span>
                             </a>
                         </li>
