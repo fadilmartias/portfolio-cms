@@ -20,7 +20,7 @@ class ProjectSeeder extends Seeder
             'image' => 'ptipd.png',
             'tech' => ['wordpress'],
             'type' => 'Freelance Project',
-            'password' => bcrypt('cp')
+            'password' => 'cp'
         ]);
     }
 }

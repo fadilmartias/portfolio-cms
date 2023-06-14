@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
-use App\Models\TemporaryFile;
 use Illuminate\Http\Request;
+use App\Models\TemporaryFile;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 
 class ProjectController extends Controller
@@ -61,7 +63,7 @@ class ProjectController extends Controller
             'description' => $data['description'],
             'link' => $data['link'],
             'tech' => $dataTech,
-            'password' => bcrypt($data['password']),
+            'password' => $data['password'],
             'type' => $data['type'],
             'image' => $request->image,
         ]);
@@ -88,7 +90,9 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        //
+        return view('projects.edit', [
+            'data' => $project
+        ]);
     }
 
     /**
@@ -104,7 +108,7 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        //
+        return 'anj';
     }
 
     public function upload(Project $project, Request $request)
@@ -131,6 +135,8 @@ class ProjectController extends Controller
             $file = $request->file('image');
             $filename = $file->getClientOriginalName();
             $folder = uniqid() . '-' . now()->timestamp;
+            Session::put('folder', $folder);
+            Session::put('filename', $filename);
             $file->storeAs('public/projects/tmp/' . $folder, $filename);
 
             TemporaryFile::create([
@@ -141,5 +147,26 @@ class ProjectController extends Controller
             return $folder;
         }
         return '';
+    }
+
+    public function imgDestroy(Request $request, $id) {
+
+        $folder = Session::get('folder');
+        $filename = Session::get('filename');
+
+        $path = storage_path('app/public/projects/tmp/' . $folder . '/' . $filename);
+        if (File::exists($path)) {
+            File::delete($path);
+             rmdir(storage_path('app/public/projects/tmp/' . $folder));
+
+            TemporaryFile::where([
+                'folder' => $folder,
+                'filename' => $filename
+            ])->delete();
+
+            return 'success';
+        } else {
+            return 'not found';
+        }
     }
 }

@@ -157,13 +157,34 @@
             FilePondPluginFileValidateSize,
         );
 
-        const pond = FilePond.create(document.querySelector('#image'), {
+        const pond = FilePond.create(document.querySelector('#image'));
+        let key;
+
+
+        FilePond.setOptions({
             server: {
-                process: '{{ route('projects.upload') }}',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                }
-            }
+                process: {
+                    url: '{{ route('projects.upload') }}',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    },
+                    onload: (response) => {
+                        key = response;
+                        console.log(key);
+                        FilePond.setOptions({
+                            server: {
+                                revert: {
+                                    url: `/projects/imgDestroy/${key}`,
+                                },
+                                headers: {
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                }
+                            }
+                        });
+                    },
+                    onerror: (response) => console.log(response),
+                },
+            },
         });
 
         const quill = new Quill('#description', {
@@ -182,8 +203,8 @@
             const desc = quill.root.innerHTML;
             document.querySelector('#descriptionInput').value = desc
             document.querySelector('#techInput').value = choices.getValue(true);
-            form.submit();
-        })
+            // form.submit();
 
+        })
     </script>
 @endpush

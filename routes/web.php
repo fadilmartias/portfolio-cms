@@ -25,6 +25,8 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('/projects', ProjectController::class)->except(['show']);
     Route::post('/projects/upload', [ProjectController::class, 'upload'])->name('projects.upload');
+    Route::delete('/projects/imgDestroy/{id}', [ProjectController::class, 'imgDestroy'])->name('projects.imgDestroy');
+
 });
 
 Auth::routes();
