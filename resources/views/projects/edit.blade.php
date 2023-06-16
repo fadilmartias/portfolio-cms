@@ -5,8 +5,10 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
-                <form action="{{ route('projects.update', $data->id) }}" id="form" method="post" enctype="multipart/form-data">
+                <form action="{{ route('projects.update', $data->id) }}" id="form" method="post"
+                    enctype="multipart/form-data">
                     @csrf
+                    @method('PUT')
                     <div class="card-body">
                         <div class="row mb-3">
                             <div class="col-lg-12">
@@ -25,8 +27,7 @@
                                 <label for="labelInput" class="form-label">Description</label>
                                 <div id="description" style="height: 200px;">
                                 </div>
-                                <input type="hidden" name="description" id="descriptionInput"
-                                    value="{{ old('description', $data->description) }}">
+                                <input type="hidden" name="description" id="descriptionInput">
                             </div>
                             @error('description')
                                 <div class="text-sm text-danger">
@@ -50,8 +51,6 @@
                             <div class="col-lg-12">
                                 <label for="labelInput" class="form-label">Tech</label>
                                 <select class="form-control" id="tech" data-choices multiple>
-                                    <option value="wordpress">Wordpress</option>
-                                    <option value="laravel">Laravel</option>
                                 </select>
                                 <input type="hidden" id="techInput" name="tech">
                             </div>
@@ -65,11 +64,12 @@
                             <div class="col-lg-12">
                                 <label for="labelInput" class="form-label">Type</label>
                                 <select title="type" name="type" class="form-select">
-                                    <option disabled selected>-- Pilih Type --</option>
+                                    <option @selected(old('type') == $data->type)>{{ $data->type }}
+                                    </option>
                                     <option value="Freelance Project">Freelance Project</option>
                                     <option value="Personal Project">Personal Project</option>
                                     <option value="Coursework">Coursework</option>
-                                    <option value="Work Project">Course Work</option>
+                                    <option value="Work Project">Work Project</option>
                                 </select>
                             </div>
                             @error('type')
@@ -94,30 +94,17 @@
                             <div class="col-lg-12">
                                 <label for="labelInput" class="form-label">Image</label>
                                 @if ($data->image)
-                                <div class="my-2 alert alert-info" id="info-foto">
-                                    <span>Foto projecy yang sudah diinput: </span>
-                                    <div class="d-flex flex-wrap gap-2 my-2">
-
-                                        <a href="{{ $data->image }}" data-fancybox="gallery2"
-                                            data-caption="{{ $data->title }}">
-                                            <div class="position-relative">
-                                                <img src="{{ $data->image }}" alt="{{ $data->title }}"
-                                                    width="80" class="img-fluid img-thumbnail">
-
-                                                <div class="position-absolute" style="top: -10px; right: -5px;"
-                                                    id="foto-{{ $data->id }}"
-                                                    onclick="event.preventDefault();imgDestroy({{ $data->id }});">
-                                                    <i class="ri-close-circle-fill text-danger fs-4"></i>
-                                                </div>
-                                            </div>
-                                        </a>
+                                    <div class="my-2 alert alert-info">
+                                        <a data-fancybox data-type="image" class="text-primary"
+                                            href="{{ asset('/storage/projects') . '/' . $data->image }}">Klik untuk melihat foto project yang sudah
+                                            diupload</a><span>
+                                            <br>Upload
+                                            ulang jika ingin mengganti foto.</span>
                                     </div>
-                                    <p class="m-0">Tekan tombol silang untuk menghapus foto.</p>
-                                    <p class="m-0">Upload foto jika ingin menambahkan foto serah terima.</p>
-                                </div>
                                 @endif
                                 <input type="file" class="filepond" name="image" id="image"
                                     data-allow-reorder="true" data-max-file-size="3MB">
+                                <small>Maksimum ukuran file adalah 3MB</small>
 
                                 <!-- end card body -->
                             </div>
@@ -151,6 +138,7 @@
     <link rel="stylesheet"
         href="{{ asset('assets/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.css') }}"
         type="text/css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css" type="text/css" />
     <link href="{{ asset('assets/libs/choices.js/public/assets/styles/base.min.css') }}" type="text/css" />
     <link href="{{ asset('assets/libs/choices.js/public/assets/styles/choices.min.css') }}" type="text/css" />
 @endpush
@@ -161,6 +149,7 @@
     <script src="{{ asset('assets/libs/quill/quill.min.js') }}"></script>
     <!-- filepond js -->
     <script src="{{ asset('assets/libs/filepond/filepond.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/filepond-plugin-file-encode/filepond-plugin-file-encode.min.js') }}"></script>
     <script src="{{ asset('assets/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.js') }}"></script>
     <script src="{{ asset('assets/libs/filepond-plugin-file-validate-size/filepond-plugin-file-validate-size.min.js') }}">
     </script>
@@ -174,36 +163,43 @@
     <script src="{{ asset('assets/libs/prismjs/prism.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@4.0/dist/fancybox.umd.js"></script>
 
-<!-- Delete Image -->
-<script src="{{ URL::asset('/assets/libs/sweetalert2/sweetalert2.min.js') }}"></script>
+    <!-- Delete Image -->
+    <script src="{{ URL::asset('/assets/libs/sweetalert2/sweetalert2.min.js') }}"></script>
 
     <script>
         FilePond.registerPlugin(
+            FilePondPluginFileEncode,
             FilePondPluginImagePreview,
             FilePondPluginImageExifOrientation,
             FilePondPluginFileValidateSize,
         );
 
-        const pond = FilePond.create(document.querySelector('#image'), {
-            server: {
-                process: '{{ route('projects.upload') }}',
-                revert: '{{ route('projects.imgDestroy') }}',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                }
-            }
-        });
+        const pond = FilePond.create(document.querySelector('#image'));
 
         const quill = new Quill('#description', {
             theme: 'snow'
         });
+        quill.root.innerHTML = `{!! $data->description !!}`;
 
         const choices = new Choices('[data-choices]', {
             placeholder: true,
             placeholderValue: '-- Pilih Tech --',
             removeItems: true,
             removeItemButton: true,
+            choices: [{
+                    value: 'wordpress',
+                    label: 'Wordpress'
+                },
+                {
+                    value: 'laravel',
+                    label: 'Laravel',
+                },
+            ],
         });
+
+        let data = {!! html_entity_decode(json_encode($data->tech)) !!};
+        choices.setChoiceByValue(data);
+
         const form = document.querySelector('#form');
         form.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -211,65 +207,6 @@
             document.querySelector('#descriptionInput').value = desc
             document.querySelector('#techInput').value = choices.getValue(true);
             form.submit();
-        })
-
-        let dataFoto = {{ $data->image }}
-
-        function imgDestroy(id) {
-        let el = event.target.parentElement.parentElement.parentElement;
-
-        Swal.fire({
-            html: '<div class="mt-3">' +
-                '<lord-icon src="https://cdn.lordicon.com/gsqxdxog.json" trigger="loop" colors="primary:#f7b84b,secondary:#f06548" style="width:100px;height:100px"></lord-icon>' +
-                '<div class="mt-4 pt-2 fs-15 mx-5">' +
-                '<h4>Anda Yakin ?</h4>' +
-                '<p class="text-muted mx-4 mb-0">Anda yakin ingin menghapus foto ini ?</p>' +
-                '</div>' +
-                '</div>',
-            showCancelButton: true,
-            reverseButtons: true,
-            confirmButtonClass: 'btn btn-primary w-xs mb-1',
-            confirmButtonText: 'Ya, Hapus!',
-            cancelButtonClass: 'btn btn-danger w-xs mb-1 me-2',
-            cancelButtonText: 'Batal',
-            buttonsStyling: false,
-            showCloseButton: true
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: '/nup/foto/hapus/' + id,
-                    method: 'put',
-                    context: el,
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                    },
-                    success: function(data) {
-                        Toastify({
-                            text: "Foto berhasil dihapus",
-                            duration: 5000,
-                            close: true,
-                            gravity: "top", // `top` or `bottom`
-                            position: "right", // `left`, `center` or `right`
-                            stopOnFocus: true, // Prevents dismissing of toast on hover
-                            className: 'bg-primary',
-                            style: {
-                                background: "linear-gradient(to right, rgb(10, 179, 156), rgb(64, 81, 137))"
-                            },
-                            onClick: function() {} // Callback after click
-                        }).showToast();
-
-                        el.remove();
-
-                        dataFoto ? hideInfoFoto() : '';
-                    }
-                })
-            }
-        })
-    }
-
-    const hideInfoFoto = () => {
-        return $('#info-foto').addClass('d-none');
-    }
-
+        });
     </script>
 @endpush

@@ -38,7 +38,7 @@
                                     <td>{{ $item->id }}</td>
                                     <td>{{ $item->title }}</td>
                                     <td>{!! $item->description !!}</td>
-                                    <td><img width="300px" height="200px" src="{{ $item->image }}"
+                                    <td><img width="300px" height="200px" src="{{ asset('/storage/projects') . '/' . $item->image }}"
                                             alt="{{ $item->title }}"></td>
                                     <td>
                                         <ul>
@@ -56,23 +56,29 @@
                                             </button>
                                             <ul class="dropdown-menu dropdown-menu-end">
 
-                                                <li><a href="{{ route('projects.edit', $item->id) }}" class="dropdown-item edit-item-btn"><i
+                                                <li><a href="{{ route('projects.edit', $item->id) }}"
+                                                        class="dropdown-item edit-item-btn"><i
                                                             class="ri-pencil-fill align-bottom me-2 text-muted"></i>
                                                         Edit</a>
                                                 </li>
                                                 <li>
-                                                    <a class="dropdown-item remove-item-btn">
-                                                        <i class="ri-delete-bin-fill align-bottom me-2 text-muted"></i>
-                                                        Delete
-                                                    </a>
+                                                    <form id="delete-{{ $item->id }}"
+                                                        action="{{ route('projects.destroy', $item->id) }}" method="POST">
+                                                        @csrf
+                                                        <button type="button" onclick="confirmDelete({{ $item->id }})"
+                                                            class="dropdown-item remove-item-btn">
+                                                            <i class="ri-delete-bin-fill align-bottom me-2 text-muted"></i>
+                                                            Delete
+                                                        </button>
+                                                        @method('DELETE')
+                                                    </form>
+
                                                 </li>
                                             </ul>
                                         </div>
                                     </td>
                                 </tr>
                             @endforeach
-
-
                         </tbody>
                     </table>
                 </div>
@@ -88,11 +94,16 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" />
     <!--datatable responsive css-->
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap.min.css" />
+    <link rel="stylesheet" href="{{ asset('assets/libs/toastify-js/src/toastify.css') }}" type="text/css" />
+    <!-- Sweet Alert css-->
+    <link href="assets/libs/sweetalert2/sweetalert2.min.css" rel="stylesheet" type="text/css" />
 @endpush
 
 @push('scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="{{ asset('assets/libs/toastify-js/src/toastify.js') }}"></script>
+    <script src="{{ asset('/assets/libs/sweetalert2/sweetalert2.min.js') }}"></script>
 
     <!--datatable js-->
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
@@ -102,5 +113,46 @@
         document.addEventListener("DOMContentLoaded", function() {
             new DataTable("#datatable")
         });
+    </script>
+    @if (Session::has('success'))
+        <script>
+            Toastify({
+                text: "{{ session()->get('success') }}",
+                duration: 5000,
+                close: true,
+                gravity: "top", // `top` or `bottom`
+                position: "right", // `left`, `center` or `right`
+                stopOnFocus: true, // Prevents dismissing of toast on hover
+                className: 'bg-primary',
+                style: {
+                    background: "linear-gradient(to right, rgb(10, 179, 156), rgb(64, 81, 137))"
+                },
+            }).showToast();
+        </script>
+    @endif
+    <script>
+        const confirmDelete = id => {
+            Swal.fire({
+                html: '<div class="mt-3">' +
+                    '<lord-icon src="https://cdn.lordicon.com/gsqxdxog.json" trigger="loop" colors="primary:#f7b84b,secondary:#f06548" style="width:100px;height:100px"></lord-icon>' +
+                    '<div class="mt-4 pt-2 fs-15 mx-5">' +
+                    '<h4>Anda Yakin ?</h4>' +
+                    '<p class="text-muted mx-4 mb-0">Anda yakin ingin menghapus data ini ?</p>' +
+                    '</div>' +
+                    '</div>',
+                showCancelButton: true,
+                reverseButtons: true,
+                confirmButtonClass: 'btn btn-primary w-xs mb-1',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonClass: 'btn btn-danger w-xs mb-1 me-2',
+                cancelButtonText: 'Batal',
+                buttonsStyling: false,
+                showCloseButton: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $(`#delete-${id}`).submit();
+                }
+            })
+        }
     </script>
 @endpush

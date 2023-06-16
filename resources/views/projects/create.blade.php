@@ -50,8 +50,6 @@
                             <div class="col-lg-12">
                                 <label for="labelInput" class="form-label">Tech</label>
                                 <select class="form-control" id="tech" data-choices multiple>
-                                    <option value="wordpress">Wordpress</option>
-                                    <option value="laravel">Laravel</option>
                                 </select>
                                 <input type="hidden" id="techInput" name="tech">
                             </div>
@@ -94,8 +92,7 @@
                             <div class="col-lg-12">
                                 <label for="labelInput" class="form-label">Image</label>
 
-                                <input type="file" class="filepond" name="image" id="image"
-                                    data-allow-reorder="true" data-max-file-size="3MB">
+                                <input type="file" class="filepond" name="image" id="image" data-max-file-size="3MB">
 
                                 <!-- end card body -->
                             </div>
@@ -138,6 +135,7 @@
     <script src="{{ asset('assets/libs/quill/quill.min.js') }}"></script>
     <!-- filepond js -->
     <script src="{{ asset('assets/libs/filepond/filepond.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/filepond-plugin-file-encode/filepond-plugin-file-encode.min.js') }}"></script>
     <script src="{{ asset('assets/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.js') }}"></script>
     <script src="{{ asset('assets/libs/filepond-plugin-file-validate-size/filepond-plugin-file-validate-size.min.js') }}">
     </script>
@@ -152,40 +150,13 @@
 
     <script>
         FilePond.registerPlugin(
+            FilePondPluginFileEncode,
             FilePondPluginImagePreview,
             FilePondPluginImageExifOrientation,
             FilePondPluginFileValidateSize,
         );
 
         const pond = FilePond.create(document.querySelector('#image'));
-        let key;
-
-
-        FilePond.setOptions({
-            server: {
-                process: {
-                    url: '{{ route('projects.upload') }}',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    },
-                    onload: (response) => {
-                        key = response;
-                        console.log(key);
-                        FilePond.setOptions({
-                            server: {
-                                revert: {
-                                    url: `/projects/imgDestroy/${key}`,
-                                },
-                                headers: {
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                }
-                            }
-                        });
-                    },
-                    onerror: (response) => console.log(response),
-                },
-            },
-        });
 
         const quill = new Quill('#description', {
             theme: 'snow'
@@ -196,6 +167,15 @@
             placeholderValue: '-- Pilih Tech --',
             removeItems: true,
             removeItemButton: true,
+            choices: [{
+                    value: 'wordpress',
+                    label: 'Wordpress'
+                },
+                {
+                    value: 'laravel',
+                    label: 'Laravel',
+                },
+            ],
         });
         const form = document.querySelector('#form');
         form.addEventListener('submit', (e) => {
@@ -203,7 +183,7 @@
             const desc = quill.root.innerHTML;
             document.querySelector('#descriptionInput').value = desc
             document.querySelector('#techInput').value = choices.getValue(true);
-            // form.submit();
+            form.submit();
 
         })
     </script>

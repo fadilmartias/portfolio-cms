@@ -23,11 +23,4 @@ class Project extends Model
     protected $casts = [
         'tech' => 'array',
     ];
-
-    protected function image(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => asset('/storage/projects/' . $value),
-        );
-    }
 }
