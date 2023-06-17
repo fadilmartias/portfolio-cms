@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ProjectResource extends JsonResource
@@ -24,7 +25,22 @@ class ProjectResource extends JsonResource
         return [
             'rc'        => $this->status,
             'message'   => $this->message,
-            'data'      => $this->resource
+            'data'      => $this->transformProjects($this->resource)
         ];
+    }
+
+    private function transformProjects($projects)
+    {
+        return $projects->map(function ($project) {
+            $projectData = $project->toArray();
+
+            // Mendapatkan URL gambar dari storage
+            $imageUrl = url('storage/projects/' . $project->image);
+
+            // Menambahkan URL gambar ke data proyek
+            $projectData['image'] = $imageUrl;
+
+            return $projectData;
+        });
     }
 }

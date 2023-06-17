@@ -9,7 +9,7 @@
                     <a href="{{ route('projects.create') }}" class="btn btn-primary">Tambah Data</a>
                 </div>
                 <div class="card-body">
-                    <table id="datatable" class="table table-bordered dt-responsive nowrap table-striped align-middle"
+                    <table id="datatable" class="table table-bordered dt-responsive table-striped align-middle"
                         style="width:100%">
                         <thead>
                             <tr>
@@ -35,7 +35,7 @@
                                                 value="option1">
                                         </div>
                                     </th>
-                                    <td>{{ $item->id }}</td>
+                                    <td>{{ $loop->iteration }}</td>
                                     <td>{{ $item->title }}</td>
                                     <td>{!! $item->description !!}</td>
                                     <td><img width="300px" height="200px" src="{{ asset('/storage/projects') . '/' . $item->image }}"
